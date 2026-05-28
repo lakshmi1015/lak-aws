@@ -1,0 +1,176 @@
+
+
+create security group
+
+aws ec2 create-security-group `
+  --group-name "lakshmi-sg-28may" `
+  --description "Security group for EC2 instances" `
+  --vpc-id vpc-06f20cbbf8523492e `
+  --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=lakshmi-sg-28may}]" `
+  --region us-east-1
+
+output:
+
+{
+    "GroupId": "sg-0ff17516261b6cf5c",
+    "Tags": [
+        {
+            "Key": "Name",
+            "Value": "lakshmi-sg-28may"
+        }
+    ],
+    "SecurityGroupArn": "arn:aws:ec2:us-east-1:969433238608:security-group/sg-0ff17516261b6cf5c"
+}
+
+create EC2 instance
+
+
+aws ec2 run-instances `
+  --image-id ami-00e801948462f718a `
+  --instance-type t3.micro `
+  --key-name lak-virginia-keypair `
+  --subnet-id subnet-06739a96c4ecd3fcc `
+  --security-group-ids sg-0ff17516261b6cf5c `
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=lakshmi-ec2-28May2026}]" `
+  --region us-east-1
+output:
+
+{
+    "ReservationId": "r-09d478eb273f542f2",
+    "OwnerId": "969433238608",
+    "Groups": [],
+    "Instances": [
+        {
+            "Architecture": "x86_64",
+            "BlockDeviceMappings": [],
+            "ClientToken": "d93e5872-e6a2-44bf-8756-6ad70c33d625",
+            "EbsOptimized": false,
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "NetworkInterfaces": [
+                {
+                    "Attachment": {
+                        "AttachTime": "2026-05-28T17:58:43+00:00",
+                        "AttachmentId": "eni-attach-05615397dabc60008",
+                        "DeleteOnTermination": true,
+                        "DeviceIndex": 0,
+                        "Status": "attaching",
+                        "NetworkCardIndex": 0
+                    },
+                    "Description": "",
+                    "Groups": [
+                        {
+                            "GroupId": "sg-0ff17516261b6cf5c",
+                            "GroupName": "lakshmi-sg-28may"
+                        }
+ ],
+                    "Ipv6Addresses": [],
+                    "MacAddress": "02:12:13:d3:a9:19",
+                    "NetworkInterfaceId": "eni-0ba0b56aa66cb6df2",
+                    "OwnerId": "969433238608",
+                    "PrivateDnsName": "ip-10-3-1-52.ec2.internal",
+                    "PrivateIpAddress": "10.3.1.52",
+                    "PrivateIpAddresses": [
+                        {
+                            "Primary": true,
+                            "PrivateDnsName": "ip-10-3-1-52.ec2.internal",
+                            "PrivateIpAddress": "10.3.1.52"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Status": "in-use",
+                    "SubnetId": "subnet-06739a96c4ecd3fcc",
+                    "VpcId": "vpc-06f20cbbf8523492e",
+                    "InterfaceType": "interface",
+                    "Operator": {
+                        "Managed": false
+                    }
+                }
+            ],
+            "RootDeviceName": "/dev/xvda",
+            "RootDeviceType": "ebs",
+            "SecurityGroups": [
+                {
+                    "GroupId": "sg-0ff17516261b6cf5c",
+                    "GroupName": "lakshmi-sg-28may"
+                }
+            ],
+            "SourceDestCheck": true,
+            "StateReason": {
+                "Code": "pending",
+                "Message": "pending"
+            },
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "lakshmi-ec2-28May2026"
+                }
+            ],
+            "VirtualizationType": "hvm",
+            "CpuOptions": {
+                "CoreCount": 1,
+                "ThreadsPerCore": 2
+            },
+            "CapacityReservationSpecification": {
+                "CapacityReservationPreference": "open"
+            },
+            "MetadataOptions": {
+                "State": "pending",
+                "HttpTokens": "required",
+                "HttpPutResponseHopLimit": 2,
+                "HttpEndpoint": "enabled",
+                "HttpProtocolIpv6": "disabled",
+                "InstanceMetadataTags": "disabled"
+            },
+            "EnclaveOptions": {
+                "Enabled": false
+            },
+            "BootMode": "uefi-preferred",
+            "PrivateDnsNameOptions": {
+                "HostnameType": "ip-name",
+                "EnableResourceNameDnsARecord": false,
+                "EnableResourceNameDnsAAAARecord": false
+            },
+            "MaintenanceOptions": {
+                "AutoRecovery": "default",
+                "RebootMigration": "default"
+            },
+            "CurrentInstanceBootMode": "uefi",
+            "Operator": {
+                "Managed": false
+            },
+            "InstanceId": "i-018b0d0f635eb55f8",
+            "ImageId": "ami-00e801948462f718a",
+            "State": {
+                "Code": 0,
+                "Name": "pending"
+            },
+            "PrivateDnsName": "ip-10-3-1-52.ec2.internal",
+            "PublicDnsName": "",
+            "StateTransitionReason": "",
+            "KeyName": "lak-virginia-keypair",
+            "AmiLaunchIndex": 0,
+            "ProductCodes": [],
+            "InstanceType": "t3.micro",
+            "LaunchTime": "2026-05-28T17:58:43+00:00",
+            "Placement": {
+                "AvailabilityZoneId": "use1-az1",
+                "GroupName": "",
+                "Tenancy": "default",
+                "AvailabilityZone": "us-east-1a"
+            },
+            "Monitoring": {
+                "State": "disabled"
+            },
+            "SubnetId": "subnet-06739a96c4ecd3fcc",
+            "VpcId": "vpc-06f20cbbf8523492e",
+            "PrivateIpAddress": "10.3.1.52"
+        }
+    ]
+}
+
+
+
+
+                    ],
+-- More  --
