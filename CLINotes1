@@ -1,0 +1,163 @@
+Steps to create my vpc, subnets, ACLs, Load Balancer
+
+aws sts get-caller-identity
+aws configure
+
+Access key ID,Secret access key
+AKIA6DNVZJRIANCP4G3C,KWBMDYjsVBxBSokgNYjF1w6NmhL3yHX8iJ4mk5Ro
+
+
+AWS Access Key ID [****************4G3C]: AKIA6DNVZJRIANCP4G3C
+AWS Secret Access Key [****************k5Ro]: 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
+Default region name [us-east-1]:
+
+
+
+aws s3 ls
+
+CIDR block
+
+=========================
+C:\Users\anave>aws ec2 create-vpc --cidr-block 10.3.0.0/16 --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=lakprod-vpc-27may}]"
+
+output:
+
+
+To enable dns hostname to enabled
+aws ec2 modify-vpc-attribute --vpc-id vpc-06f20cbbf8523492e --enable-dns-hostnames "{\"Value\": true}"
+
+3)Create subnets
+
+create an aws vpc public(10.3.1.0/24)and private subnet(10.3.2.0/24) in us-east-1
+
+C:\Users\anave>aws ec2 create-subnet --vpc-id vpc-06f20cbbf8523492e --cidr-block 10.3.1.0/24 --availability-zone us-east-1a --region us-east-1
+
+
+output:
+{
+    "Subnet": {
+        "AvailabilityZoneId": "use1-az1",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "969433238608",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:969433238608:subnet/subnet-06739a96c4ecd3fcc",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+        },
+        "SubnetId": "subnet-06739a96c4ecd3fcc",
+        "State": "available",
+        "VpcId": "vpc-06f20cbbf8523492e",
+        "CidrBlock": "10.3.1.0/24",
+        "AvailableIpAddressCount": 251,
+        "AvailabilityZone": "us-east-1a",
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false
+    }
+}
+
+aws ec2 create-subnet --vpc-id vpc-06f20cbbf8523492e --cidr-block 10.3.2.0/24 --availability-zone us-east-1b --region us-east-1
+
+{
+    "Subnet": {
+        "AvailabilityZoneId": "use1-az2",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "969433238608",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:969433238608:subnet/subnet-0cfc24c5310037d58",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+        },
+        "SubnetId": "subnet-0cfc24c5310037d58",
+        "State": "available",
+        "VpcId": "vpc-06f20cbbf8523492e",
+        "CidrBlock": "10.3.2.0/24",
+        "AvailableIpAddressCount": 251,
+        "AvailabilityZone": "us-east-1b",
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false
+    }
+}
+
+
+Creating Internet Gateway
+
+aws ec2 create-internet-gateway --region us-east-1
+igw-08559db962c927746
+
+C:\Users\anave>aws ec2 create-internet-gateway --region us-east-1
+{
+    "InternetGateway": {
+        "Attachments": [],
+        "InternetGatewayId": "igw-08559db962c927746",
+        "OwnerId": "969433238608",
+        "Tags": []
+    }
+}
+
+
+C:\Users\anave>set IGW_ID=igw-08559db962c927746
+Attach the Internet Gateway to your VPC
+
+
+C:\Users\anave>aws ec2 attach-internet-gateway --internet-gateway-id igw-08559db962c927746 --vpc-id vpc-06f20cbbf8523492e --region us-east-1
+
+create route table
+aws ec2 create-route-table --vpc-id vpc-06f20cbbf8523492e --region us-east-1
+
+
+set RTB_ID=rtb-050d750d97949936c
+set IGW_ID=igw-08559db962c927746
+
+aws ec2 create-route --route-table-id %RTB_ID% --destination-cidr-block 0.0.0.0/0 --gateway-id %IGW_ID% --region us-east-1
+
+set PUB_SUBNET=subnet-06739a96c4ecd3fcc
+aws ec2 associate-route-table --route-table-id rtb-050d750d97949936c --subnet-id %PUB_SUBNET% --region us-east-1
+
+{
+    "AssociationId": "rtbassoc-0bb092856c3f4464c",
+    "AssociationState": {
+        "State": "associated"
+    }
+}
+
+
+creting an EC2 instance
+
+set AMI_ID=ami-0e86e20dae9224db8
+set INSTANCE_TYPE=t3.micro
+set SUBNET_ID=subnet-06739a96c4ecd3fcc
+set SG_ID=sg-xxxxxxxx
+
+aws ec2 run-instances ^
+  --image-id %AMI_ID% ^
+  --instance-type %INSTANCE_TYPE% ^
+  --subnet-id %SUBNET_ID% ^
+  --security-group-ids %SG_ID% ^
+  --associate-public-ip-address ^
+  --region us-east-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
