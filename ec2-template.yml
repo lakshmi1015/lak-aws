@@ -13,7 +13,7 @@ Parameters:
     Description: EC2 instance type
 
   KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
+    Type: AWS::EC2::KeyPair::lak-virginia-keypair
     Description: Name of an existing EC2 key pair for SSH access
 
   AmiId:
