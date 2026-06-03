@@ -5,42 +5,42 @@ Parameters:
 
   VpcName:
     Type: String
-    Default: 'VPC-Anji'
+    Default: 'VPC-Lakshmi'
     Description: 'Name of the VPC'
 
   VpcCidr:
     Type: String
-    Default: '10.0.0.0/16'
+    Default: '10.20.0.0/16'
     Description: 'CIDR block for the VPC'
 
   PublicSubnetName:
     Type: String
-    Default: 'Public-Subnet-Anji'
+    Default: 'Public-Subnet-Lakshmi'
     Description: 'Name of the Public Subnet'
 
   PublicSubnetCidr:
     Type: String
-    Default: '10.0.1.0/24'
+    Default: '10.20.1.0/24'
     Description: 'CIDR block for the Public Subnet'
 
   PrivateSubnetName:
     Type: String
-    Default: 'Private-Subnet-Anji'
+    Default: 'Private-Subnet-Lakshmi'
     Description: 'Private Subnet Name'
 
   PrivateSubnetCidr:
     Type: String
-    Default: '10.0.2.0/24'
+    Default: '10.20.2.0/24'
     Description: 'CIDR block for the Private Subnet'
 
   IsolatedSubnetName:
     Type: String
-    Default: 'Isolated-Subnet-Anji'
+    Default: 'Isolated-Subnet-Lakshmi'
     Description: 'Isolated Subnet Name'
 
   IsolatedSubnetCidr:
     Type: String
-    Default: '10.0.3.0/24'
+    Default: '10.20.3.0/24'
     Description: 'CIDR block for the Isolated Subnet'
 
 Resources:
