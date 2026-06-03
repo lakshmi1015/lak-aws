@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Enterprise VPC with Public, Private, and Isolated subnets.'
+
+Parameters:
+
+  VpcName:
+    Type: String
+    Default: 'VPC-Anji'
+    Description: 'Name of the VPC'
+
+  VpcCidr:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: 'CIDR block for the VPC'
+
+  PublicSubnetName:
+    Type: String
+    Default: 'Public-Subnet-Anji'
+    Description: 'Name of the Public Subnet'
+
+  PublicSubnetCidr:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: 'CIDR block for the Public Subnet'
+
+  PrivateSubnetName:
+    Type: String
+    Default: 'Private-Subnet-Anji'
+    Description: 'Private Subnet Name'
+
+  PrivateSubnetCidr:
+    Type: String
+    Default: '10.0.2.0/24'
+    Description: 'CIDR block for the Private Subnet'
+
+  IsolatedSubnetName:
+    Type: String
+    Default: 'Isolated-Subnet-Anji'
+    Description: 'Isolated Subnet Name'
+
+  IsolatedSubnetCidr:
+    Type: String
+    Default: '10.0.3.0/24'
+    Description: 'CIDR block for the Isolated Subnet'
+
+Resources:
+
+  # ── VPC ──────────────────────────────────────────────────────────────────────
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref VpcName
+
+  # ── Internet Gateway ─────────────────────────────────────────────────────────
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${VpcName}-IGW'
+
+  VPCGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # ── Subnets ──────────────────────────────────────────────────────────────────
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnetName
+
+  PrivateSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnetCidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnetName
+
+  IsolatedSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref IsolatedSubnetCidr
+      AvailabilityZone: !Select [2, !GetAZs '']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Ref IsolatedSubnetName
+
+  # ── Route Tables ─────────────────────────────────────────────────────────────
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${PublicSubnetName}-RT'
+
+  PrivateRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${PrivateSubnetName}-RT'
+
+  IsolatedRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${IsolatedSubnetName}-RT'
+
+  # ── Routes ───────────────────────────────────────────────────────────────────
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  # ── Route Table Associations ─────────────────────────────────────────────────
+  PublicSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  IsolatedSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref IsolatedSubnet
+      RouteTableId: !Ref IsolatedRouteTable
+
+Outputs:
+
+  VpcId:
+    Description: 'The ID of the VPC'
+    Value: !Ref VPC
+
+  PublicSubnetId:
+    Description: 'The ID of the Public Subnet'
+    Value: !Ref PublicSubnet
+
+  PrivateSubnetId:
+    Description: 'The ID of the Private Subnet'
+    Value: !Ref PrivateSubnet
+
+  IsolatedSubnetId:
+    Description: 'The ID of the Isolated Subnet'
+    Value: !Ref IsolatedSubnet
